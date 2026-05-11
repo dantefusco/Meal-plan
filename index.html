@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dieta">
+<title>Piano Alimentare – Fusco</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg: #0e0d0b;
+    --surface: #161512;
+    --card: #1c1a16;
+    --border: #2a2720;
+    --dante: #c8652a;
+    --dante-soft: rgba(200,101,42,0.12);
+    --laura: #7a5c9e;
+    --laura-soft: rgba(122,92,158,0.12);
+    --gold: #c9a84c;
+    --text: #e8e2d9;
+    --text-muted: #7a7269;
+    --text-dim: #4a4540;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; min-height:100vh; overflow-x:hidden; }
+
+  header { position:sticky; top:0; z-index:100; background:rgba(14,13,11,0.94); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:12px 20px 10px; }
+  .header-inner { display:flex; align-items:center; justify-content:space-between; max-width:480px; margin:0 auto; }
+  .logo { font-family:'Playfair Display',serif; font-size:11px; font-weight:700; letter-spacing:0.25em; text-transform:uppercase; color:var(--dante); }
+  body.laura .logo { color:var(--laura); }
+  .week-badge { font-size:9px; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; background:var(--dante-soft); border:1px solid rgba(200,101,42,0.2); padding:4px 10px; border-radius:2px; }
+  body.laura .week-badge { background:var(--laura-soft); border-color:rgba(122,92,158,0.2); }
+
+  .person-toggle { max-width:480px; margin:0 auto; padding:14px 20px 0; display:flex; }
+  .person-btn { flex:1; padding:10px 8px; border:1px solid var(--border); background:var(--surface); font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; -webkit-user-select:none; display:flex; align-items:center; justify-content:center; gap:6px; color:var(--text-muted); }
+  .person-btn:first-child { border-radius:3px 0 0 3px; border-right:none; }
+  .person-btn:last-child  { border-radius:0 3px 3px 0; }
+  .person-btn.dante-active { background:var(--dante); border-color:var(--dante); color:#fff; }
+  .person-btn.laura-active { background:var(--laura); border-color:var(--laura); color:#fff; }
+
+  .page { display:none; padding-bottom:90px; }
+  .page.active { display:block; }
+
+  .today-hero { max-width:480px; margin:0 auto; padding:18px 20px 0; }
+  .today-label { font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px; }
+  .today-day { font-family:'Playfair Display',serif; font-size:36px; font-weight:900; line-height:1; color:var(--text); margin-bottom:4px; }
+  .today-day span { color:var(--dante); }
+  body.laura .today-day span { color:var(--laura); }
+  .today-week-info { font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; }
+  .today-week-info b { color:var(--gold); }
+
+  .tabs { max-width:480px; margin:0 auto; padding:0 20px; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab { flex-shrink:0; padding:7px 12px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; cursor:pointer; border-radius:2px; transition:all 0.2s; text-transform:uppercase; -webkit-user-select:none; }
+  .tab.active { color:#fff; }
+  body:not(.laura) .tab.active { background:var(--dante); border-color:var(--dante); }
+  body.laura .tab.active { background:var(--laura); border-color:var(--laura); }
+
+  .meals-container { max-width:480px; margin:0 auto; padding:12px 20px 0; }
+  .meal-panel { display:none; }
+  .meal-panel.active { display:block; }
+  .meal-card { background:var(--card); border:1px solid var(--border); border-radius:4px; overflow:hidden; margin-bottom:12px; animation:fadeUp 0.25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .meal-card-header { padding:12px 16px 8px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .meal-title-group { display:flex; align-items:center; }
+  .meal-icon { font-size:18px; margin-right:10px; }
+  .meal-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color:var(--text); }
+  .meal-time { font-size:9px; letter-spacing:0.2em; text-transform:uppercase; }
+  body:not(.laura) .meal-time { color:var(--dante); }
+  body.laura .meal-time { color:var(--laura); }
+  .copy-btn { border:1px solid; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; padding:5px 9px; border-radius:2px; cursor:pointer; transition:all 0.2s; -webkit-user-select:none; }
+  body:not(.laura) .copy-btn { background:var(--dante-soft); border-color:rgba(200,101,42,0.25); color:var(--dante); }
+  body.laura .copy-btn { background:var(--laura-soft); border-color:rgba(122,92,158,0.25); color:var(--laura); }
+  .copy-btn.copied { background:rgba(74,124,89,0.15); border-color:rgba(74,124,89,0.4); color:#4a7c59; }
+  .meal-body { padding:10px 16px; }
+  .day-row { display:flex; gap:10px; padding:8px 6px; border-bottom:1px solid var(--border); border-radius:2px; margin:0 -6px; }
+  .day-row:last-child { border-bottom:none; }
+  .day-row.today-row { border:1px solid; border-radius:3px; padding:8px 8px; margin:2px -6px; }
+  body:not(.laura) .day-row.today-row { background:var(--dante-soft); border-color:rgba(200,101,42,0.2); }
+  body.laura .day-row.today-row { background:var(--laura-soft); border-color:rgba(122,92,158,0.2); }
+  .day-label { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-muted); min-width:52px; padding-top:2px; flex-shrink:0; }
+  body:not(.laura) .today-row .day-label { color:var(--dante); }
+  body.laura .today-row .day-label { color:var(--laura); }
+  .day-food { font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5; color:var(--text); font-weight:300; }
+
+  .pre-workout { background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.2); border-radius:3px; padding:9px 13px; margin-bottom:10px; display:flex; align-items:flex-start; gap:10px; }
+  .pre-workout-text { font-size:11px; line-height:1.5; color:var(--gold); }
+  .pre-workout-label { font-size:8px; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:2px; opacity:0.7; }
+
+  .week-selector { max-width:480px; margin:0 auto; padding:12px 20px 0; display:flex; gap:6px; }
+  .week-btn { flex:1; padding:8px 4px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:9px; cursor:pointer; border-radius:2px; text-align:center; transition:all 0.2s; text-transform:uppercase; -webkit-user-select:none; }
+  .week-btn.active { color:#fff; }
+  body:not(.laura) .week-btn.active { background:var(--dante); border-color:var(--dante); }
+  body.laura .week-btn.active { background:var(--laura); border-color:var(--laura); }
+  body:not(.laura) .week-btn.current-week:not(.active) { border-color:rgba(200,101,42,0.4); color:var(--dante); }
+  body.laura .week-btn.current-week:not(.active) { border-color:rgba(122,92,158,0.4); color:var(--laura); }
+
+  .week-view-container { max-width:480px; margin:0 auto; padding:12px 20px 32px; }
+  .day-block { margin-bottom:16px; }
+  .day-block-label { font-size:9px; letter-spacing:0.25em; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; }
+  body:not(.laura) .day-block-label.today { color:var(--dante); }
+  body.laura .day-block-label.today { color:var(--laura); }
+  .day-block-card { background:var(--card); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  body:not(.laura) .day-block-card.today { border-color:rgba(200,101,42,0.3); }
+  body.laura .day-block-card.today { border-color:rgba(122,92,158,0.3); }
+  .day-meal-row { padding:10px 14px; border-bottom:1px solid var(--border); }
+  .day-meal-row:last-child { border-bottom:none; }
+  .day-meal-label { font-size:8px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-bottom:3px; }
+  .day-meal-text { font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5; color:var(--text); font-weight:300; }
+  .day-pre { padding:8px 14px; background:rgba(201,168,76,0.06); border-bottom:1px solid var(--border); font-size:11px; color:var(--gold); }
+
+  /* CUCINA */
+  .cucina-header { max-width:480px; margin:0 auto; padding:20px 20px 12px; }
+  .cucina-title { font-family:'Playfair Display',serif; font-size:26px; font-weight:900; color:var(--text); margin-bottom:3px; }
+  .cucina-sub { font-size:10px; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; }
+  .cucina-divider { max-width:480px; margin:0 auto 0; height:1px; background:var(--border); }
+  .cucina-week-selector { max-width:480px; margin:0 auto; padding:12px 20px 0; display:flex; gap:6px; }
+  .cucina-week-btn { flex:1; padding:8px 4px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-family:'DM Mono',monospace; font-size:9px; cursor:pointer; border-radius:2px; text-align:center; transition:all 0.2s; text-transform:uppercase; -webkit-user-select:none; }
+  .cucina-week-btn.active { background:var(--gold); border-color:var(--gold); color:#1a1510; }
+  .cucina-container { max-width:480px; margin:0 auto; padding:12px 20px 32px; }
+  .cucina-day-block { margin-bottom:20px; }
+  .cucina-day-label { font-size:9px; letter-spacing:0.25em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+  .cucina-day-label.today { color:var(--gold); }
+  .shared-meal-card { background:var(--card); border:1px solid var(--border); border-radius:4px; overflow:hidden; margin-bottom:8px; }
+  .shared-meal-header { padding:10px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .shared-meal-name { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); }
+  .shared-badge { font-size:8px; letter-spacing:0.12em; text-transform:uppercase; padding:3px 8px; border-radius:2px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold); }
+  .shared-portions { display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid var(--border); }
+  .shared-portion { padding:10px 14px; }
+  .shared-portion:first-child { border-right:1px solid var(--border); }
+  .shared-person-label { font-size:8px; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:4px; }
+  .shared-person-label.dante { color:var(--dante); }
+  .shared-person-label.laura { color:var(--laura); }
+  .shared-portion-text { font-family:'Cormorant Garamond',serif; font-size:13px; line-height:1.45; color:var(--text); font-weight:300; }
+  .shared-total { padding:10px 14px; background:rgba(201,168,76,0.05); }
+  .shared-total-label { font-size:8px; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+  .shared-total-text { font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5; color:var(--text); font-weight:400; }
+
+  /* SETUP / NOTE */
+  .page-header { max-width:480px; margin:0 auto; padding:22px 20px 12px; }
+  .page-title { font-family:'Playfair Display',serif; font-size:26px; font-weight:900; color:var(--text); margin-bottom:3px; }
+  .page-sub { font-size:10px; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; }
+  .divider { max-width:480px; margin:0 auto 12px; height:1px; background:var(--border); }
+  .guide-section { max-width:480px; margin:0 auto; padding:0 20px 32px; }
+  .section-title { font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; padding-top:18px; border-top:1px solid var(--border); }
+  .section-title:first-child { border-top:none; padding-top:0; }
+  .guide-card { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:13px 15px; margin-bottom:8px; }
+  .step-num { font-size:9px; letter-spacing:0.2em; color:var(--dante); text-transform:uppercase; margin-bottom:5px; }
+  .step-text { font-family:'Cormorant Garamond',serif; font-size:15px; line-height:1.6; color:var(--text); font-weight:300; }
+  .step-text strong { font-weight:700; }
+  .orari { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .orario-pill { background:var(--surface); border:1px solid var(--border); border-radius:2px; padding:6px 11px; font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; }
+  .orario-pill .pill-time { color:var(--dante); font-weight:500; }
+  .note-chip { background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:10px 13px; margin-bottom:7px; display:flex; gap:10px; }
+  .note-num { font-size:9px; color:var(--dante); min-width:16px; letter-spacing:0.1em; padding-top:1px; }
+  .note-text { font-family:'Cormorant Garamond',serif; font-size:13px; line-height:1.55; color:var(--text-muted); font-weight:300; }
+  .equiv-grid { max-width:480px; margin:0 auto; padding:0 20px 32px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .equiv-card { background:var(--card); border:1px solid var(--border); border-radius:3px; padding:10px; }
+  .equiv-qty { font-size:12px; color:var(--dante); margin-bottom:3px; font-weight:500; }
+  .equiv-desc { font-family:'Cormorant Garamond',serif; font-size:12px; line-height:1.4; color:var(--text-muted); font-weight:300; }
+
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(14,13,11,0.96); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding:8px 0; padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; padding:4px 0; -webkit-user-select:none; }
+  .nav-icon { font-size:17px; color:var(--text-dim); }
+  .nav-label { font-size:8px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); }
+  body:not(.laura) .nav-item.active .nav-icon,
+  body:not(.laura) .nav-item.active .nav-label { color:var(--dante); }
+  body.laura .nav-item.active .nav-icon,
+  body.laura .nav-item.active .nav-label { color:var(--laura); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">Piano Alimentare</div>
+    <div class="week-badge" id="header-week">Settimana —</div>
+  </div>
+</header>
+
+<!-- PAGE: OGGI -->
+<div class="page active" id="page-oggi">
+  <div class="person-toggle">
+    <button class="person-btn dante-active" id="btn-dante" onclick="setPerson('dante')">👤 Dante</button>
+    <button class="person-btn" id="btn-laura" onclick="setPerson('laura')">👤 Laura</button>
+  </div>
+  <div class="today-hero">
+    <div class="today-label">Oggi è</div>
+    <div class="today-day" id="today-display">—</div>
+    <div class="today-week-info" id="today-week-info">—</div>
+  </div>
+  <div class="tabs" id="meal-tabs">
+    <button class="tab active" onclick="showMeal('colazione',this)">🥣 Colazione</button>
+    <button class="tab laura-only" id="tab-merenda-m" style="display:none" onclick="showMeal('merenda_m',this)">🍊 Merenda</button>
+    <button class="tab" onclick="showMeal('pranzo',this)">🍽️ Pranzo</button>
+    <button class="tab" onclick="showMeal('spuntino',this)">🍎 Spuntino</button>
+    <button class="tab laura-only" id="tab-merenda-p" style="display:none" onclick="showMeal('merenda_p',this)">🍫 Merenda pm</button>
+    <button class="tab" onclick="showMeal('cena',this)">🌙 Cena</button>
+  </div>
+  <div class="meals-container">
+    <div class="meal-panel active" id="panel-colazione">
+      <div id="pre-workout-banner"></div>
+      <div class="meal-card">
+        <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🥣</div><div><div class="meal-name">Colazione</div><div class="meal-time">Entro le 10:00</div></div></div><button class="copy-btn" onclick="copyTodayMeal('colazione',this)">Copia</button></div>
+        <div class="meal-body" id="body-colazione"></div>
+      </div>
+    </div>
+    <div class="meal-panel" id="panel-merenda_m">
+      <div class="meal-card">
+        <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🍊</div><div><div class="meal-name">Merenda mattina</div><div class="meal-time">10:30</div></div></div><button class="copy-btn" onclick="copyTodayMeal('merenda_m',this)">Copia</button></div>
+        <div class="meal-body" id="body-merenda_m"></div>
+      </div>
+    </div>
+    <div class="meal-panel" id="panel-pranzo">
+      <div class="meal-card">
+        <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🍽️</div><div><div class="meal-name">Pranzo</div><div class="meal-time">13:00</div></div></div><button class="copy-btn" onclick="copyTodayMeal('pranzo',this)">Copia</button></div>
+        <div class="meal-body" id="body-pranzo"></div>
+      </div>
+    </div>
+    <div class="meal-panel" id="panel-spuntino">
+      <div class="meal-card">
+        <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🍎</div><div><div class="meal-name">Spuntino</div><div class="meal-time">16:00 – 17:00</div></div></div><button class="copy-btn" onclick="copyTodayMeal('spuntino',this)">Copia</button></div>
+        <div class="meal-body" id="body-spuntino"></div>
+      </div>
+    </div>
+    <div class="meal-panel" id="panel-merenda_p">
+      <div class="meal-card">
+        <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🍫</div><div><div class="meal-name">Merenda pom.</div><div class="meal-time">16:30</div></div></div><button class="copy-btn" onclick="copyTodayMeal('merenda_p',this)">Copia</button></div>
+        <div class="meal-body" id="body-merenda_p"></div>
+      </div>
+    </div>
+    <div class="meal-panel" id="panel-cena">
+      <div class="meal-card">
+        <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🌙</div><div><div class="meal-name">Cena</div><div class="meal-time">Entro le 20:30</div></div></div><button class="copy-btn" onclick="copyTodayMeal('cena',this)">Copia</button></div>
+        <div class="meal-body" id="body-cena"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: SETTIMANA -->
+<div class="page" id="page-settimana">
+  <div class="page-header"><div class="page-title">Settimane</div><div class="page-sub" id="week-page-sub">Piano completo · 4 settimane</div></div>
+  <div class="divider"></div>
+  <div class="person-toggle" style="padding-top:0;">
+    <button class="person-btn dante-active" id="wbtn-dante" onclick="setPerson('dante')">👤 Dante</button>
+    <button class="person-btn" id="wbtn-laura" onclick="setPerson('laura')">👤 Laura</button>
+  </div>
+  <div class="week-selector">
+    <button class="week-btn" onclick="showWeek(1,this)">Sett. 1</button>
+    <button class="week-btn" onclick="showWeek(2,this)">Sett. 2</button>
+    <button class="week-btn" onclick="showWeek(3,this)">Sett. 3</button>
+    <button class="week-btn" onclick="showWeek(4,this)">Sett. 4</button>
+  </div>
+  <div class="week-view-container" id="week-view"></div>
+</div>
+
+<!-- PAGE: CUCINA -->
+<div class="page" id="page-cucina">
+  <div class="cucina-header">
+    <div class="cucina-title">Cucina</div>
+    <div class="cucina-sub">Portate in comune · grammature totali</div>
+  </div>
+  <div class="cucina-divider"></div>
+  <div class="cucina-week-selector">
+    <button class="cucina-week-btn" onclick="showCucinaWeek(1,this)">Sett. 1</button>
+    <button class="cucina-week-btn" onclick="showCucinaWeek(2,this)">Sett. 2</button>
+    <button class="cucina-week-btn" onclick="showCucinaWeek(3,this)">Sett. 3</button>
+    <button class="cucina-week-btn" onclick="showCucinaWeek(4,this)">Sett. 4</button>
+  </div>
+  <div class="cucina-container" id="cucina-view"></div>
+</div>
+
+<!-- PAGE: SETUP -->
+<div class="page" id="page-shortcut">
+  <div class="page-header"><div class="page-title">Setup</div><div class="page-sub">Notifiche iOS · Guida</div></div>
+  <div class="divider"></div>
+  <div class="guide-section">
+    <div class="section-title" style="border-top:none;padding-top:0;">Orari configurati</div>
+    <div class="orari">
+      <div class="orario-pill">🥣 <span class="pill-time">9:45</span> Colazione</div>
+      <div class="orario-pill">🍽️ <span class="pill-time">12:50</span> Pranzo</div>
+      <div class="orario-pill">🍎 <span class="pill-time">16:30</span> Spuntino</div>
+      <div class="orario-pill">🌙 <span class="pill-time">20:00</span> Cena</div>
+    </div>
+    <div class="section-title">Come configurare su iPhone</div>
+    <div class="guide-card"><div class="step-num">Passo 01</div><div class="step-text">Apri <strong>Shortcuts</strong> → <strong>Automation</strong> → <strong>+</strong> → <strong>New Automation</strong></div></div>
+    <div class="guide-card"><div class="step-num">Passo 02</div><div class="step-text">Scegli <strong>Time of Day</strong> → imposta l'orario → <strong>Daily</strong></div></div>
+    <div class="guide-card"><div class="step-num">Passo 03</div><div class="step-text">Lascia attivo <strong>"Ask Before Running"</strong> → così arriva una notifica da toccare per aprire la webapp</div></div>
+    <div class="guide-card"><div class="step-num">Passo 04</div><div class="step-text">Azione: <strong>Open URLs</strong> → incolla <span style="color:var(--gold);font-size:11px;">https://dantefusco.github.io/Meal-plan/</span></div></div>
+    <div class="guide-card"><div class="step-num">Passo 05</div><div class="step-text">Ripeti per i 4 orari. La webapp calcola settimana e giorno automaticamente.</div></div>
+    <div class="section-title">Aggiungi alla Home Screen</div>
+    <div class="guide-card"><div class="step-num">Safari</div><div class="step-text">Apri il link in Safari → <strong>Share</strong> → <strong>Add to Home Screen</strong></div></div>
+  </div>
+</div>
+
+<!-- PAGE: NOTE -->
+<div class="page" id="page-note">
+  <div class="page-header"><div class="page-title">Note</div><div class="page-sub">Consigli della nutrizionista</div></div>
+  <div class="divider"></div>
+  <div style="max-width:480px;margin:0 auto;padding:0 20px 20px;">
+    <div class="note-chip"><div class="note-num">01</div><div class="note-text">Acqua almeno 2L al giorno</div></div>
+    <div class="note-chip"><div class="note-num">02</div><div class="note-text">Omega 3 (1 capsula a colazione) + Melatonina 1mg per dormire (Dante)</div></div>
+    <div class="note-chip"><div class="note-num">03</div><div class="note-text">Integratori e barrette: MyProtein, Koro, Prozis, Bulk. Per trasferte: barrette 20-30gr, gallette, frutta secca, lupini</div></div>
+    <div class="note-chip"><div class="note-num">04</div><div class="note-text">Frutta: agrumi, mele, pere, kiwi, uva, fichi, susine, melograno. Verdura: cavoli, cime di rapa, spinaci, carote, finocchi, carciofi, zucca</div></div>
+    <div class="note-chip"><div class="note-num">05</div><div class="note-text">Caffè: max 3-4/giorno (Dante) · max 1/giorno (Laura)</div></div>
+    <div class="note-chip"><div class="note-num">06</div><div class="note-text">Alcol: max 2 calici vino o birra 0.33cl a settimana (Dante)</div></div>
+    <div class="note-chip"><div class="note-num">07</div><div class="note-text">Formaggi freschi > stagionati: ricotta, primo sale, fiocchi di latte, Ph. Benessere. Preferire carni bianche</div></div>
+    <div class="note-chip"><div class="note-num">08</div><div class="note-text">Cotture preferite: vapore, friggitrice ad aria, forno, griglia</div></div>
+    <div class="note-chip"><div class="note-num">09</div><div class="note-text">Nocciolate/marmellate: Rigoni di Asiago (Natù). Latticini: Granarolo Pro</div></div>
+  </div>
+  <div style="max-width:480px;margin:0 auto;padding:0 20px 10px;"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--text);margin-bottom:3px;">Equivalenze</div><div style="font-size:10px;letter-spacing:0.2em;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px;">Grammature di riferimento</div></div>
+  <div class="equiv-grid">
+    <div class="equiv-card"><div class="equiv-qty">150gr yogurt greco</div><div class="equiv-desc">1 vasetto o 9-10 cucchiai da minestra</div></div>
+    <div class="equiv-card"><div class="equiv-qty">125gr yogurt bianco</div><div class="equiv-desc">1 vasetto o 8 cucchiai da minestra</div></div>
+    <div class="equiv-card"><div class="equiv-qty">100gr frutta</div><div class="equiv-desc">1 mela, 1 pera o 1 banana</div></div>
+    <div class="equiv-card"><div class="equiv-qty">10-15gr cioccolato</div><div class="equiv-desc">1 quadratino della tavoletta</div></div>
+    <div class="equiv-card"><div class="equiv-qty">80-100gr pasta</div><div class="equiv-desc">Due pugni abbondanti</div></div>
+    <div class="equiv-card"><div class="equiv-qty">50gr pane</div><div class="equiv-desc">Bocconcino Esselunga</div></div>
+    <div class="equiv-card"><div class="equiv-qty">70gr riso/cous cous</div><div class="equiv-desc">2 tazzine e mezzo di caffè</div></div>
+    <div class="equiv-card"><div class="equiv-qty">10gr frutta secca</div><div class="equiv-desc">10 mandorle o 5 noci o 1 cucchiaino crema</div></div>
+    <div class="equiv-card"><div class="equiv-qty">100gr pollo</div><div class="equiv-desc">2 fettine</div></div>
+    <div class="equiv-card"><div class="equiv-qty">150gr legumi</div><div class="equiv-desc">¾ vasetto in vetro o 3-4 cucchiai</div></div>
+    <div class="equiv-card"><div class="equiv-qty">50gr bresaola</div><div class="equiv-desc">5-6 fette</div></div>
+    <div class="equiv-card"><div class="equiv-qty">130gr hummus</div><div class="equiv-desc">8-9 cucchiai da minestra</div></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="showPage('oggi',this)"><div class="nav-icon">☀️</div><div class="nav-label">Oggi</div></div>
+  <div class="nav-item" onclick="showPage('settimana',this)"><div class="nav-icon">📅</div><div class="nav-label">Settimane</div></div>
+  <div class="nav-item" onclick="showPage('cucina',this)"><div class="nav-icon">🍳</div><div class="nav-label">Cucina</div></div>
+  <div class="nav-item" onclick="showPage('shortcut',this)"><div class="nav-icon">🔔</div><div class="nav-label">Setup</div></div>
+  <div class="nav-item" onclick="showPage('note',this)"><div class="nav-icon">📋</div><div class="nav-label">Note</div></div>
+</nav>
+
+<script>
+const dietDante = {
+  1:{
+    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Cous cous 60gr + pollo 200gr + verdura 200gr + olio evo 10ml + un frutto",spuntino:"2 gallette al cioccolato",cena:"Spatzle di zucca 120-150gr (Mamma Emma) + cremina con Philadelphia Benessere 50gr + acqua + parmigiano 10gr"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Patate 200gr + merluzzo gratinato al forno 200gr + verdura 150gr + olio evo 10ml"},
+    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Riso basmati 70gr + ceci o lenticchie cotti 130gr + carote + olio evo 15ml",spuntino:"Proteine polvere Whey 20gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Pane ai cereali 60gr + 2 uova strapazzate o al tegamino + Philadelphia Benessere 30gr + verdura grigliata + olio evo 15ml"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr",cena:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
+    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Riso basmati o venere 60gr + gamberetti 200gr + verdura 150-200gr + olio evo 15ml",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Pasta 80gr con crema di piselli: piselli cotti 150gr frullati con acqua di cottura + olio evo 10ml + sale/pepe + parmigiano 1 cucchiaino"},
+    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Polenta 50gr + pollo 200gr o carne rossa magra 150gr (es. roastbeef) + verdura + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 60gr + finocchi o carote crude"}
+  },
+  2:{
+    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pasta di lenticchie 100gr con sugo al pomodoro + zucchine spadellate con 1 cucchiaino olio evo",spuntino:"2 gallette al cioccolato oppure un frutto + frutta secca 10gr",cena:"Gnocchi al pomodoro 200gr + bresaola 90gr o prosciutto cotto 70gr + parmigiano 10gr + verdura (es. rucola)"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Patate al forno o purè 200gr + pollo/tacchino 200gr o vitello 180gr + verdura 150gr + olio evo 10ml"},
+    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Riso basmati 70gr + salmone fresco 100gr (Esselunga Top) + zucchine o cavoletti + olio evo 15ml",spuntino:"Proteine polvere Whey 25gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Pane 70gr o carasau o 2 fajitas di mais 40gr + hummus di ceci 130gr + guacamole 20-30gr o parmigiano 10gr + verdura grigliata"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr",cena:"Pasta 80gr con crema di zucca e feta: zucca cotta 200gr frullata con olio evo 10ml + feta light 90gr a cubetti"},
+    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Ravioli di carne 180gr con sugo al pomodoro + zucchine spadellate con 1 cucchiaino olio evo",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Pane 60gr + 2 uova al tegamino o strapazzate + olio evo 10ml + verdura + parmigiano 5-7gr"},
+    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Patate al forno o bollite 200gr + tartare di Chianina/Fassona 150gr + verdura + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"Pane 60gr o carasau + hummus di ceci 130gr + verdura cruda"}
+  },
+  3:{
+    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pane 60gr + salmone affumicato 70gr + avocado 30-40gr o Philadelphia Benessere 30gr + olio evo 1 cucchiaino + verdura 200gr + un frutto",spuntino:"2 gallette al cioccolato",cena:"Spatzle di spinaci 120-150gr + cremina con ricotta 100gr + acqua + pomodorini"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Polenta 50gr + pollo 200gr o straccetti di soia 80gr + verdura + olio evo 10ml"},
+    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Pasta di lenticchie 80gr con sugo al pomodoro + zucchine spadellate con olio evo 5ml",spuntino:"Proteine polvere Whey 20gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Riso venere o basmati 70gr + 2 uova sode + verdura + olio evo 10ml + parmigiano 5-7gr"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr o cioccolato",cena:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
+    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Cous cous 60gr + ceci 150gr + verdura 150gr + olio evo 10ml",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Patate al forno o bollite 200gr + pollo o coniglio 180gr + verdura + olio evo 10ml"},
+    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Polenta 50gr + merluzzo al pomodoro 180gr + verdura + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 60gr + finocchi o carote crude"}
+  },
+  4:{
+    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Cous cous 60gr + gamberetti 200gr + verdura 200gr + olio evo 10ml + un frutto",spuntino:"2 gallette al cioccolato",cena:"Ravioli con ricotta e spinaci 180-200gr + sugo al pomodoro + un frutto"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Cous cous 60gr + pollo e peperoni 200gr + olio evo 10ml"},
+    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Riso basmati 70gr + ceci o lenticchie cotti 130gr + carote + olio evo 15ml",spuntino:"Proteine polvere Whey 25gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Pane ai cereali 60gr + 2 uova strapazzate o al tegamino + Philadelphia Benessere 30gr + verdura grigliata + olio evo 15ml"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr",cena:"Gnocchi di zucca 200gr (Mamma Emma) + feta light 90gr o cremina con Philadelphia Benessere 50gr + parmigiano 10gr"},
+    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Riso basmati o venere 60gr + pollo 180gr o bresaola 90-100gr + verdura 150-200gr + olio evo 15ml",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Vellutata di piselli e patate (150gr+150gr) + pane 50gr + un frutto"},
+    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pasta 80gr con zucchine e bocconcini di pesce spada 150gr totale + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 60gr + finocchi o carote crude"}
+  }
+};
+
+const dietLaura = {
+  1:{
+    lunedi:   {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Un frutto + frutta secca 10gr o castagne al forno 40gr + frutta secca 10gr",pranzo:"Cous cous o riso 80gr + pollo 150gr + verdura 200gr + olio evo 20ml",spuntino:"2 gallette al cioccolato oppure 1 fetta pane 25gr con cioccolato 15gr + crema frutta secca 10gr + frutto",cena:"Spatzle di zucca 150gr (Mamma Emma) + cremina con Ph. Benessere 50gr + acqua + parmigiano 10gr"},
+    martedi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",merenda_m:"Un frutto + frutta secca 10gr",pranzo:"Secondo carne/pesce con verdura e pane, o panino con mozzarella e verdura grigliata",merenda_p:"Yogurt bianco magro 125gr o kefir 150gr + un frutto + 1 biscotto sbriciolato o cioccolato fondente 10gr",cena:"Patate 250gr + merluzzo gratinato al forno 180-200gr + verdura 150gr + olio evo 15ml"},
+    mercoledi:{colazione:"Latte parzialmente scremato 150ml + 2 fette pane bianco o ai cereali + nocciolata 15gr o crema frutta secca + marmellata 20gr",merenda_m:"Un frutto + frutta secca 10gr o castagne 40gr + frutta secca 10gr",pranzo:"Riso basmati 70gr + ceci o lenticchie 150gr (peso cotto) + carote + olio evo 20ml",merenda_p:"Yogurt bianco magro 125gr o kefir 150gr + un frutto + 1 biscotto sbriciolato o cioccolato fondente 10gr",cena:"Pane ai cereali 80gr + 2 uova strapazzate o al tegamino + Ph. Benessere 30gr + verdura grigliata + olio evo 20ml"},
+    giovedi:  {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Un frutto + frutta secca 10gr",pranzo:"Riso basmati o cous cous o farro 70-80gr + tonno in scatola 80gr sgocciolato + verdura 200gr + olio evo 10ml",spuntino:"2 gallette al cioccolato oppure 1 fetta pane 25gr con cioccolato 15gr + crema frutta secca 10gr + frutto",cena:"Frisella o piadina 80-90gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
+    venerdi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",spuntino:"Un frutto + frutta secca 10gr",pranzo:"Riso basmati o venere 80gr + gamberetti o calamari 200gr + verdura 150-200gr + olio evo 20ml",merenda_p:"Mela e pera cotta con cannella + yogurt bianco greco 125gr + cioccolato 10gr",cena:"Pasta 100gr con crema di piselli: piselli 150gr frullati con acqua di cottura + olio evo 10ml + parmigiano 1 cucchiaino"},
+    sabato:   {colazione:"Pancake: 1 uovo + farina 40gr + lievito 1 cucchiaino + cannella + crema frutta secca 10gr o nocciolata + un frutto",spuntino:"Un frutto + frutta secca 10gr",pranzo:"Polenta 70-80gr + pollo 150gr o carne rossa magra 120gr + verdura + olio evo 10ml",merenda_p:"Mela e pera cotta con cannella + yogurt bianco greco 125gr + cioccolato 10gr",cena:"🍕 Pizza"},
+    domenica: {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Spremuta o succo 100% frutta + frutta secca 10gr",pranzo:"🍽️ Fuori",merenda_p:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml per cottura) + pane 80gr + finocchi o carote crude"}
+  },
+  2:{
+    lunedi:   {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Un frutto + frutta secca 10gr o castagne 40gr + frutta secca 10gr",pranzo:"Pasta di lenticchie 100gr con sugo al pomodoro + zucchine spadellate con 1 cucchiaino olio evo + parmigiano 10gr",spuntino:"2 gallette al cioccolato oppure 1 fetta pane 25gr con cioccolato 15gr + crema frutta secca 10gr + frutto",cena:"Gnocchi al pomodoro 220-250gr + prosciutto cotto o roastbeef 80gr + parmigiano 10gr + verdura (es. rucola)"},
+    martedi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",merenda_m:"Spremuta + frutta secca 10gr",pranzo:"Secondo carne/pesce con verdura e pane, o panino con mozzarella e verdura grigliata",merenda_p:"Budino mela e cacao: mela frullata con 1 cucchiaio cacao + 1 cucchiaino miele, in frigo 2h + yogurt bianco 125gr",cena:"Patate al forno 250gr + pollo o tacchino 150gr o vitello 180gr + verdura 150gr + olio evo 15ml"},
+    mercoledi:{colazione:"Latte parzialmente scremato 150ml + 2 fette pane bianco o ai cereali + nocciolata 15gr o crema frutta secca + marmellata 20gr",merenda_m:"Un frutto + frutta secca 10gr",pranzo:"Riso basmati o pane 80gr + orata 150-170gr + zucchine o cavoletti + olio evo 15ml",merenda_p:"Yogurt bianco magro 125gr o kefir 150gr + un frutto + 1 biscotto sbriciolato o cioccolato fondente 10gr",cena:"Pane normale o carasau 80gr o 3 fajitas di mais 40gr + hummus di ceci 130gr + guacamole 30-35gr o parmigiano 10gr + verdura grigliata"},
+    giovedi:  {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Crackers 40gr + frutta secca 10gr",pranzo:"Pane 80gr + frittata di verdura con 2 uova + olio evo 15ml",spuntino:"2 gallette al cioccolato + un frutto",cena:"Pasta 100gr con crema di zucca e feta: zucca cotta 200gr frullata con olio evo 10ml + feta light 90gr a cubetti"},
+    venerdi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",spuntino:"Un frutto + frutta secca 10gr",pranzo:"Ravioli di carne 180gr con sugo al pomodoro + zucchine spadellate con 1 cucchiaino olio evo + parmigiano 10gr",merenda_p:"Mela e pera cotta con cannella + yogurt bianco greco 125gr + cioccolato 10gr",cena:"Pane o piadina 80gr + tonno in scatola 80gr sgocciolato + olio evo 10ml + verdura + Ph. Benessere 20gr"},
+    sabato:   {colazione:"Pancake: 1 uovo + farina 40gr + lievito 1 cucchiaino + cannella + crema frutta secca 10gr o nocciolata + un frutto",spuntino:"Un frutto + frutta secca 10gr",pranzo:"Patate al forno o bollite 250gr + roastbeef 150gr + verdura + olio evo 15ml",merenda_p:"Frutta fresca 100-150gr + frutta secca 10gr o cioccolato o 2 biscotti",cena:"🍕 Pizza"},
+    domenica: {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Spremuta o succo 100% frutta + frutta secca 10gr",pranzo:"🍽️ Fuori",merenda_p:"Frutta fresca + frutta secca 10gr",cena:"Pane normale o carasau 80gr + hummus di ceci 130gr + verdura + parmigiano 10gr"}
+  },
+  3:{
+    lunedi:   {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Un frutto + frutta secca 10gr o castagne 40gr + frutta secca 10gr",pranzo:"Pane 80gr + salmone affumicato 70gr + avocado 40-50gr o Ph. Benessere 30gr + olio evo 1 cucchiaino + verdura 200gr + un frutto",spuntino:"2 gallette al cioccolato oppure 1 fetta pane 25gr con cioccolato 15gr + crema frutta secca 10gr + frutto",cena:"Spatzle di spinaci 150-160gr + cremina con ricotta 100gr + acqua + pomodorini"},
+    martedi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",merenda_m:"Spremuta + frutta secca 10gr",pranzo:"Secondo carne/pesce con verdura e pane, o panino con mozzarella e verdura grigliata",merenda_p:"Yogurt bianco magro 125gr o kefir 150gr + un frutto + 1 biscotto sbriciolato o cioccolato fondente 10gr",cena:"Polenta 80gr + pollo 150gr o straccetti di soia 80gr + verdura + olio evo 15ml"},
+    mercoledi:{colazione:"Latte parzialmente scremato 150ml + 2 fette pane bianco o ai cereali + nocciolata 15gr o crema frutta secca + marmellata 20gr",merenda_m:"Un frutto + frutta secca 10gr",pranzo:"Pasta di lenticchie 100gr con sugo al pomodoro + zucchine spadellate con olio evo 10ml + parmigiano 10gr",merenda_p:"Cioccolata calda Ciobar con latte parz. scremato o veg 120-150ml",cena:"Riso venere o basmati 80gr + 2 uova sode + verdura + olio evo 10ml + parmigiano 10gr"},
+    giovedi:  {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Crackers 40gr + frutta secca 10gr",pranzo:"Riso basmati o venere 80gr + tonno 80gr sgocciolato + verdura + olio evo 10ml",spuntino:"Budino mela e cacao",cena:"Frisella o piadina 80-90gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
+    venerdi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",spuntino:"Un frutto + frutta secca 10gr",pranzo:"Cous cous 80gr + ceci o lenticchie o piselli 150gr + verdura 150gr + olio evo 10ml",merenda_p:"Mela e pera cotta con cannella + yogurt bianco greco 125gr + cioccolato 10gr",cena:"Patate al forno o bollite 250gr + pollo o coniglio 150gr + verdura + olio evo 15ml"},
+    sabato:   {colazione:"Pancake: 1 uovo + farina 40gr + lievito 1 cucchiaino + cannella + crema frutta secca 10gr o nocciolata + un frutto",spuntino:"Un frutto + frutta secca 10gr",pranzo:"Polenta 80gr + merluzzo al pomodoro 150-180gr + verdura + olio evo 15ml",merenda_p:"Frutta fresca 100-150gr + cioccolato 10gr",cena:"🍕 Pizza"},
+    domenica: {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Spremuta o succo 100% frutta + frutta secca 10gr",pranzo:"🍽️ Fuori",merenda_p:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 80gr + finocchi o carote cotte + olio evo 10ml"}
+  },
+  4:{
+    lunedi:   {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Un frutto + frutta secca 10gr",pranzo:"Cous cous 70-80gr + gamberetti 200gr + verdura 200gr + olio evo 10ml + un frutto",spuntino:"2 gallette al cioccolato o al miele",cena:"Ravioli con ricotta e spinaci 200gr + sugo al pomodoro + parmigiano 10gr"},
+    martedi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",merenda_m:"Spremuta + frutta secca 10gr",pranzo:"Secondo carne/pesce con verdura e pane, o panino con mozzarella e verdura grigliata",merenda_p:"Yogurt bianco magro 125gr o kefir 150gr + un frutto + 1 biscotto sbriciolato o cioccolato fondente 10gr",cena:"Cous cous 80gr + pollo e peperoni/zucchine 150gr + olio evo 20ml"},
+    mercoledi:{colazione:"Latte parzialmente scremato 150ml + 2 fette pane bianco o ai cereali + nocciolata 15gr o crema frutta secca + un frutto",pranzo:"Riso basmati 70-80gr + ceci o lenticchie 150gr (peso cotto) + carote o altra verdura + olio evo 20ml",merenda_p:"Barretta Koro da 20gr proteine",cena:"Pane ai cereali 80gr + 2 uova strapazzate o al tegamino + Ph. Benessere 30gr + verdura grigliata + olio evo 15ml + un frutto"},
+    giovedi:  {colazione:"Porridge: fiocchi d'avena 40gr + latte vaccino o veg 150ml + cioccolato 15gr + un frutto + frutta secca 10gr o crema frutta secca 100%",merenda_m:"Crackers 40gr + frutta secca 10gr",pranzo:"Farro 70gr + tonno 80gr sgocciolato + verdura + olio evo 10ml",spuntino:"Pane 25gr + ricotta 50gr + cioccolato scaglie 10gr o miele + frutti rossi",cena:"Gnocchi di zucca 250gr (Mamma Emma) + feta light 90gr o cremina Ph. Benessere 50gr + parmigiano 10gr"},
+    venerdi:  {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Un frutto + frutta secca 10gr",pranzo:"Riso basmati o venere 70gr + pollo 150gr o gamberetti 200gr o totani + verdura 150-200gr + olio evo 15ml",merenda_p:"Mela e pera cotta con cannella + yogurt bianco greco 125gr + cioccolato 10gr",cena:"Vellutata piselli e patate (150/150gr) + pane 70gr + un frutto"},
+    sabato:   {colazione:"Pancake: 1 uovo + farina 40gr + lievito 1 cucchiaino + cannella + crema frutta secca 10gr o nocciolata + un frutto",spuntino:"Un frutto + frutta secca 10gr",pranzo:"Pasta 100gr con zucchine e pesce spada 150gr totale + olio evo 10ml",merenda_p:"Un frutto + 2 biscotti",cena:"🍕 Pizza"},
+    domenica: {colazione:"Yogurt greco 0% o Kefir o Skyr 150gr + frutta secca 15gr + cereali soffiati 30gr + un frutto",merenda_m:"Spremuta o succo 100% frutta + frutta secca 10gr",pranzo:"🍽️ Fuori",merenda_p:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 80gr + finocchi o carote cotte + olio evo 10ml"}
+  }
+};
+
+const sharedMeals = {
+  1:{
+    lunedi:  {pranzo:{dante:"Cous cous 60gr + pollo 200gr + verdura 200gr + olio evo 10ml",laura:"Cous cous o riso 80gr + pollo 150gr + verdura 200gr + olio evo 20ml",totale:"Cous cous ~140gr + pollo ~350gr + verdura 400gr + olio evo 30ml",piatto:"Cous cous con pollo e verdura"},cena:{dante:"Spatzle di zucca 120-150gr + Ph. Benessere 50gr + parmigiano 10gr",laura:"Spatzle di zucca 150gr + Ph. Benessere 50gr + parmigiano 10gr",totale:"Spatzle di zucca ~300gr + Ph. Benessere 100gr + parmigiano 20gr",piatto:"Spatzle di zucca"}},
+    martedi: {cena:{dante:"Patate 200gr + merluzzo 200gr + verdura 150gr + olio evo 10ml",laura:"Patate 250gr + merluzzo 180-200gr + verdura 150gr + olio evo 15ml",totale:"Patate 450gr + merluzzo ~400gr + verdura 300gr + olio evo 25ml",piatto:"Merluzzo gratinato con patate"}},
+    mercoledi:{pranzo:{dante:"Riso basmati 70gr + ceci/lenticchie 130gr + carote + olio evo 15ml",laura:"Riso basmati 70gr + ceci/lenticchie 150gr + carote + olio evo 20ml",totale:"Riso basmati 140gr + ceci/lenticchie 280gr + carote + olio evo 35ml",piatto:"Riso basmati con legumi"},cena:{dante:"Pane 60gr + 2 uova + Ph. Benessere 30gr + verdura grigliata + olio evo 15ml",laura:"Pane 80gr + 2 uova + Ph. Benessere 30gr + verdura grigliata + olio evo 20ml",totale:"Pane 140gr + 4 uova + Ph. Benessere 60gr + verdura grigliata + olio evo 35ml",piatto:"Uova strapazzate con verdura"}},
+    sabato:  {pranzo:{dante:"Polenta 50gr + pollo 200gr + verdura + olio evo 10ml",laura:"Polenta 70-80gr + pollo 150gr + verdura + olio evo 10ml",totale:"Polenta ~125gr + pollo ~350gr + verdura + olio evo 20ml",piatto:"Polenta con pollo"},cena:{dante:"🍕 Pizza",laura:"🍕 Pizza",totale:"🍕 Pizza per entrambi",piatto:"Pizza"}},
+    domenica:{pranzo:{dante:"🍽️ Fuori",laura:"🍽️ Fuori",totale:"Fuori insieme",piatto:"Pranzo fuori"},cena:{dante:"2 uova al pomodoro + pane 60gr + finocchi o carote crude",laura:"2 uova al pomodoro + pane 80gr + finocchi o carote crude",totale:"4 uova al pomodoro + olio evo 20ml + pane 140gr + finocchi o carote",piatto:"Uova al pomodoro"}}
+  },
+  2:{
+    lunedi:  {pranzo:{dante:"Pasta di lenticchie 100gr + sugo al pomodoro + zucchine",laura:"Pasta di lenticchie 100gr + sugo al pomodoro + zucchine + parmigiano 10gr",totale:"Pasta di lenticchie 200gr + sugo al pomodoro + zucchine + parmigiano 10gr",piatto:"Pasta di lenticchie al pomodoro"},cena:{dante:"Gnocchi 200gr + bresaola 90gr o p. cotto 70gr + parmigiano 10gr + verdura",laura:"Gnocchi 220-250gr + p. cotto o roastbeef 80gr + parmigiano 10gr + verdura",totale:"Gnocchi ~445gr + affettati ~165gr + parmigiano 20gr + verdura",piatto:"Gnocchi al pomodoro con affettati"}},
+    martedi: {cena:{dante:"Patate 200gr + pollo/tacchino 200gr o vitello 180gr + verdura 150gr + olio evo 10ml",laura:"Patate 250gr + pollo o tacchino 150gr o vitello 180gr + verdura 150gr + olio evo 15ml",totale:"Patate 450gr + pollo/tacchino ~350gr + verdura 300gr + olio evo 25ml",piatto:"Patate al forno con pollo"}},
+    mercoledi:{cena:{dante:"Pane 70gr o carasau + hummus 130gr + guacamole 20-30gr + verdura grigliata",laura:"Pane 80gr o carasau + hummus 130gr + guacamole 30-35gr + verdura grigliata",totale:"Pane ~150gr + hummus 260gr + guacamole ~60gr + verdura grigliata",piatto:"Pane con hummus e guacamole"}},
+    giovedi: {cena:{dante:"Pasta 80gr + zucca 200gr frullata + olio evo 10ml + feta light 90gr",laura:"Pasta 100gr + zucca 200gr frullata + olio evo 10ml + feta light 90gr",totale:"Pasta 180gr + zucca 400gr + olio evo 20ml + feta light 180gr",piatto:"Pasta con crema di zucca e feta"}},
+    venerdi: {pranzo:{dante:"Ravioli di carne 180gr + sugo al pomodoro + zucchine",laura:"Ravioli di carne 180gr + sugo al pomodoro + zucchine + parmigiano 10gr",totale:"Ravioli di carne 360gr + sugo al pomodoro + zucchine + parmigiano 10gr",piatto:"Ravioli di carne al pomodoro"}},
+    sabato:  {pranzo:{dante:"Patate 200gr + tartare Chianina/Fassona 150gr + verdura + olio evo 10ml",laura:"Patate 250gr + roastbeef 150gr + verdura + olio evo 15ml",totale:"Patate 450gr + carne ~300gr + verdura + olio evo 25ml",piatto:"Patate con carne"},cena:{dante:"🍕 Pizza",laura:"🍕 Pizza",totale:"🍕 Pizza per entrambi",piatto:"Pizza"}},
+    domenica:{pranzo:{dante:"🍽️ Fuori",laura:"🍽️ Fuori",totale:"Fuori insieme",piatto:"Pranzo fuori"},cena:{dante:"Pane 60gr o carasau + hummus 130gr + verdura cruda",laura:"Pane 80gr o carasau + hummus 130gr + verdura + parmigiano 10gr",totale:"Pane ~140gr + hummus 260gr + verdura + parmigiano 10gr",piatto:"Pane con hummus e verdura"}}
+  },
+  3:{
+    lunedi:  {cena:{dante:"Spatzle di spinaci 120-150gr + ricotta 100gr + pomodorini",laura:"Spatzle di spinaci 150-160gr + ricotta 100gr + pomodorini",totale:"Spatzle di spinaci ~300gr + ricotta 200gr + pomodorini",piatto:"Spatzle di spinaci con ricotta"}},
+    martedi: {cena:{dante:"Polenta 50gr + pollo 200gr + verdura + olio evo 10ml",laura:"Polenta 80gr + pollo 150gr + verdura + olio evo 15ml",totale:"Polenta ~130gr + pollo ~350gr + verdura + olio evo 25ml",piatto:"Polenta con pollo"}},
+    mercoledi:{pranzo:{dante:"Pasta di lenticchie 80gr + sugo al pomodoro + zucchine",laura:"Pasta di lenticchie 100gr + sugo al pomodoro + zucchine + parmigiano 10gr",totale:"Pasta di lenticchie 180gr + sugo al pomodoro + zucchine + parmigiano 10gr",piatto:"Pasta di lenticchie al pomodoro"}},
+    giovedi: {cena:{dante:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml",laura:"Frisella o piadina 80-90gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml",totale:"Frisella ~165gr + mozzarella o ricotta 200gr + verdura grigliata + olio evo 20ml",piatto:"Frisella con mozzarella"}},
+    venerdi: {cena:{dante:"Patate 200gr + pollo o coniglio 180gr + verdura + olio evo 10ml",laura:"Patate 250gr + pollo o coniglio 150gr + verdura + olio evo 15ml",totale:"Patate 450gr + pollo o coniglio ~330gr + verdura + olio evo 25ml",piatto:"Patate con pollo"}},
+    sabato:  {pranzo:{dante:"Polenta 50gr + merluzzo al pomodoro 180gr + verdura + olio evo 10ml",laura:"Polenta 80gr + merluzzo al pomodoro 150-180gr + verdura + olio evo 15ml",totale:"Polenta ~130gr + merluzzo ~360gr + verdura + olio evo 25ml",piatto:"Polenta con merluzzo al pomodoro"},cena:{dante:"🍕 Pizza",laura:"🍕 Pizza",totale:"🍕 Pizza per entrambi",piatto:"Pizza"}},
+    domenica:{pranzo:{dante:"🍽️ Fuori",laura:"🍽️ Fuori",totale:"Fuori insieme",piatto:"Pranzo fuori"},cena:{dante:"2 uova al pomodoro + pane 60gr + finocchi o carote crude",laura:"2 uova al pomodoro + pane 80gr + finocchi o carote cotte + olio evo 10ml",totale:"4 uova al pomodoro + olio evo 20ml + pane 140gr + finocchi o carote",piatto:"Uova al pomodoro"}}
+  },
+  4:{
+    lunedi:  {pranzo:{dante:"Cous cous 60gr + gamberetti 200gr + verdura 200gr + olio evo 10ml",laura:"Cous cous 70-80gr + gamberetti 200gr + verdura 200gr + olio evo 10ml",totale:"Cous cous ~135gr + gamberetti 400gr + verdura 400gr + olio evo 20ml",piatto:"Cous cous con gamberetti"},cena:{dante:"Ravioli ricotta e spinaci 180-200gr + sugo al pomodoro",laura:"Ravioli ricotta e spinaci 200gr + sugo al pomodoro + parmigiano 10gr",totale:"Ravioli ricotta e spinaci ~395gr + sugo al pomodoro + parmigiano 10gr",piatto:"Ravioli ricotta e spinaci"}},
+    martedi: {cena:{dante:"Cous cous 60gr + pollo e peperoni 200gr + olio evo 10ml",laura:"Cous cous 80gr + pollo e peperoni/zucchine 150gr + olio evo 20ml",totale:"Cous cous 140gr + pollo e peperoni ~350gr + olio evo 30ml",piatto:"Cous cous con pollo e peperoni"}},
+    mercoledi:{pranzo:{dante:"Riso basmati 70gr + ceci/lenticchie 130gr + carote + olio evo 15ml",laura:"Riso basmati 70-80gr + ceci/lenticchie 150gr + carote + olio evo 20ml",totale:"Riso basmati ~145gr + ceci/lenticchie 280gr + carote + olio evo 35ml",piatto:"Riso con legumi e carote"},cena:{dante:"Pane 60gr + 2 uova + Ph. Benessere 30gr + verdura grigliata + olio evo 15ml",laura:"Pane 80gr + 2 uova + Ph. Benessere 30gr + verdura grigliata + olio evo 15ml",totale:"Pane 140gr + 4 uova + Ph. Benessere 60gr + verdura grigliata + olio evo 30ml",piatto:"Uova strapazzate con verdura"}},
+    giovedi: {cena:{dante:"Gnocchi di zucca 200gr + feta light 90gr + parmigiano 10gr",laura:"Gnocchi di zucca 250gr + feta light 90gr + parmigiano 10gr",totale:"Gnocchi di zucca 450gr + feta light 180gr + parmigiano 20gr",piatto:"Gnocchi di zucca con feta"}},
+    sabato:  {pranzo:{dante:"Pasta 80gr + zucchine + pesce spada 150gr + olio evo 10ml",laura:"Pasta 100gr + zucchine + pesce spada 150gr + olio evo 10ml",totale:"Pasta 180gr + zucchine + pesce spada 300gr + olio evo 20ml",piatto:"Pasta con zucchine e pesce spada"},cena:{dante:"🍕 Pizza",laura:"🍕 Pizza",totale:"🍕 Pizza per entrambi",piatto:"Pizza"}},
+    domenica:{pranzo:{dante:"🍽️ Fuori",laura:"🍽️ Fuori",totale:"Fuori insieme",piatto:"Pranzo fuori"},cena:{dante:"2 uova al pomodoro + pane 60gr + finocchi o carote crude",laura:"2 uova al pomodoro + pane 80gr + finocchi o carote cotte + olio evo 10ml",totale:"4 uova al pomodoro + olio evo 20ml + pane 140gr + finocchi o carote",piatto:"Uova al pomodoro"}}
+  }
+};
+
+const DAY_KEYS=['lunedi','martedi','mercoledi','giovedi','venerdi','sabato','domenica'];
+const DAY_LABELS={lunedi:'Lunedì',martedi:'Martedì',mercoledi:'Mercoledì',giovedi:'Giovedì',venerdi:'Venerdì',sabato:'Sabato',domenica:'Domenica'};
+const DAY_SHORT={lunedi:'Lun',martedi:'Mar',mercoledi:'Mer',giovedi:'Gio',venerdi:'Ven',sabato:'Sab',domenica:'Dom'};
+const MEAL_NAMES={colazione:'Colazione',merenda_m:'Merenda mattina',pranzo:'Pranzo',spuntino:'Spuntino',merenda_p:'Merenda pom.',cena:'Cena'};
+const MEAL_ICONS={colazione:'🥣',merenda_m:'🍊',pranzo:'🍽️',spuntino:'🍎',merenda_p:'🍫',cena:'🌙'};
+const DANTE_MEALS=['colazione','pranzo','spuntino','cena'];
+const LAURA_MEALS=['colazione','merenda_m','pranzo','spuntino','merenda_p','cena'];
+const CYCLE_START=new Date('2026-05-04T00:00:00');
+
+function getWeekDay(){
+  const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const start=new Date(CYCLE_START.getFullYear(),CYCLE_START.getMonth(),CYCLE_START.getDate());
+  const cd=(((Math.floor((today-start)/86400000))%28)+28)%28;
+  return{week:Math.floor(cd/7)+1,dayKey:DAY_KEYS[cd%7]};
+}
+
+const{week:CW,dayKey:CD}=getWeekDay();
+let selWeek=CW,cucinaWeek=CW,person='dante';
+
+function getDiet(){return person==='dante'?dietDante:dietLaura;}
+function getMeals(){return person==='dante'?DANTE_MEALS:LAURA_MEALS;}
+
+function setPerson(p){
+  person=p;
+  document.body.classList.toggle('laura',p==='laura');
+  ['btn-dante','wbtn-dante'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='person-btn'+(p==='dante'?' dante-active':'');});
+  ['btn-laura','wbtn-laura'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='person-btn'+(p==='laura'?' laura-active':'');});
+  document.querySelectorAll('.laura-only').forEach(el=>el.style.display=p==='laura'?'':'none');
+  buildPreWorkout();
+  ['colazione','merenda_m','pranzo','spuntino','merenda_p','cena'].forEach(m=>buildBody(m));
+  showWeek(selWeek,null);
+}
+
+function init(){
+  document.getElementById('header-week').textContent=`Settimana ${CW}`;
+  const dl=DAY_LABELS[CD];
+  document.getElementById('today-display').innerHTML=dl.slice(0,3)+'<span>'+dl.slice(3)+'</span>';
+  document.getElementById('today-week-info').innerHTML=`<b>Settimana ${CW}</b> &nbsp;·&nbsp; Piano alimentare Fusco`;
+  ['colazione','merenda_m','pranzo','spuntino','merenda_p','cena'].forEach(m=>buildBody(m));
+  buildPreWorkout();
+  showWeek(CW,null);
+  showCucinaWeek(CW,null);
+  document.querySelectorAll('.week-btn').forEach((b,i)=>{if(i+1===CW)b.classList.add('current-week');});
+  document.querySelectorAll('.cucina-week-btn').forEach((b,i)=>{if(i+1===CW)b.classList.add('active');});
+}
+
+function buildBody(mk){
+  const el=document.getElementById('body-'+mk);if(!el)return;
+  const diet=getDiet();if(!diet[CW])return;
+  let html='';
+  DAY_KEYS.forEach(day=>{
+    const d=diet[CW][day];const food=d?d[mk]:null;if(!food)return;
+    const isT=day===CD;
+    html+=`<div class="day-row ${isT?'today-row':''}"><div class="day-label">${DAY_SHORT[day]}${isT?' ←':''}</div><div class="day-food">${food}</div></div>`;
+  });
+  el.innerHTML=html||'<div style="padding:12px;color:var(--text-dim);font-size:12px;text-align:center;">—</div>';
+}
+
+function buildPreWorkout(){
+  const el=document.getElementById('pre-workout-banner');if(!el)return;
+  if(person!=='dante'){el.innerHTML='';return;}
+  const d=dietDante[CW][CD];
+  if(!d||!d.pre){el.innerHTML='';return;}
+  el.innerHTML=`<div class="pre-workout"><div style="font-size:16px;flex-shrink:0">⚡️</div><div class="pre-workout-text"><div class="pre-workout-label">Pre allenamento</div>${d.pre}</div></div>`;
+}
+
+function showWeek(wn,btn){
+  selWeek=wn;
+  document.querySelectorAll('.week-btn').forEach((b,i)=>b.classList.toggle('active',i+1===wn));
+  const diet=getDiet(),meals=getMeals();
+  let html='';
+  DAY_KEYS.forEach(day=>{
+    const d=diet[wn][day],isT=wn===CW&&day===CD;
+    html+=`<div class="day-block"><div class="day-block-label ${isT?'today':''}">${DAY_LABELS[day]}${isT?' · Oggi':''}</div><div class="day-block-card ${isT?'today':''}">
+    ${person==='dante'&&d.pre?`<div class="day-pre">⚡️ Pre-workout: ${d.pre}</div>`:''}
+    ${meals.map(mk=>d[mk]?`<div class="day-meal-row"><div class="day-meal-label">${MEAL_NAMES[mk]}</div><div class="day-meal-text">${d[mk]}</div></div>`:'').join('')}
+    </div></div>`;
+  });
+  document.getElementById('week-view').innerHTML=html;
+}
+
+function showCucinaWeek(wn,btn){
+  cucinaWeek=wn;
+  document.querySelectorAll('.cucina-week-btn').forEach((b,i)=>b.classList.toggle('active',i+1===wn));
+  const wd=sharedMeals[wn];let html='',any=false;
+  DAY_KEYS.forEach(day=>{
+    const ds=wd[day];if(!ds)return;
+    const isT=wn===CW&&day===CD;
+    const entries=Object.entries(ds);if(!entries.length)return;
+    any=true;
+    html+=`<div class="cucina-day-block"><div class="cucina-day-label ${isT?'today':''}">${DAY_LABELS[day]}${isT?' · Oggi':''}</div>`;
+    entries.forEach(([mk,data])=>{
+      const ml=mk==='pranzo'?'🍽️ Pranzo':'🌙 Cena';
+      html+=`<div class="shared-meal-card">
+        <div class="shared-meal-header"><div class="shared-meal-name">${ml} · ${data.piatto}</div><div class="shared-badge">In comune</div></div>
+        <div class="shared-portions">
+          <div class="shared-portion"><div class="shared-person-label dante">Dante</div><div class="shared-portion-text">${data.dante}</div></div>
+          <div class="shared-portion"><div class="shared-person-label laura">Laura</div><div class="shared-portion-text">${data.laura}</div></div>
+        </div>
+        <div class="shared-total"><div class="shared-total-label">⚖️ Totale da cucinare</div><div class="shared-total-text">${data.totale}</div></div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  if(!any)html='<div style="padding:40px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-style:italic;color:var(--text-dim);">Nessuna portata in comune questa settimana</div>';
+  document.getElementById('cucina-view').innerHTML=html;
+}
+
+function showMeal(mk,btn){
+  document.querySelectorAll('.meal-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+mk).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showPage(pid,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+pid).classList.add('active');
+  el.classList.add('active');
+}
+
+function copyTodayMeal(mk,btn){
+  const d=getDiet()[CW][CD];
+  const pre=mk==='colazione'&&person==='dante'&&d.pre?`⚡️ Pre-workout: ${d.pre}\n\n`:'';
+  const text=`${MEAL_ICONS[mk]} ${MEAL_NAMES[mk]} – ${DAY_LABELS[CD]} (Sett. ${CW})\n\n${pre}${d[mk]||'—'}`;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✓ Copiato';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copia';btn.classList.remove('copied');},2000);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
