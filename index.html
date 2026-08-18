@@ -198,7 +198,6 @@
     <button class="tab laura-only" id="tab-merenda-m" style="display:none" onclick="showMeal('merenda_m',this)">🍊 Merenda</button>
     <button class="tab" onclick="showMeal('pranzo',this)">🍽️ Pranzo</button>
     <button class="tab" onclick="showMeal('spuntino',this)">🍎 Spuntino</button>
-    <button class="tab laura-only" id="tab-merenda-p" style="display:none" onclick="showMeal('merenda_p',this)">🍫 Merenda pm</button>
     <button class="tab" onclick="showMeal('cena',this)">🌙 Cena</button>
   </div>
   <div class="meals-container">
@@ -225,12 +224,6 @@
       <div class="meal-card">
         <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🍎</div><div><div class="meal-name">Spuntino</div><div class="meal-time">16:00 – 17:00</div></div></div><button class="copy-btn" onclick="copyTodayMeal('spuntino',this)">Copia</button></div>
         <div class="meal-body" id="body-spuntino"></div>
-      </div>
-    </div>
-    <div class="meal-panel" id="panel-merenda_p">
-      <div class="meal-card">
-        <div class="meal-card-header"><div class="meal-title-group"><div class="meal-icon">🍫</div><div><div class="meal-name">Merenda pom.</div><div class="meal-time">16:30</div></div></div><button class="copy-btn" onclick="copyTodayMeal('merenda_p',this)">Copia</button></div>
-        <div class="meal-body" id="body-merenda_p"></div>
       </div>
     </div>
     <div class="meal-panel" id="panel-cena">
@@ -304,9 +297,9 @@
   <div class="divider"></div>
   <div style="max-width:480px;margin:0 auto;padding:0 20px 20px;">
     <div class="note-chip"><div class="note-num">01</div><div class="note-text">Acqua almeno 2L al giorno</div></div>
-    <div class="note-chip"><div class="note-num">02</div><div class="note-text">Omega 3 (1 capsula a colazione) + Melatonina 1mg per dormire (Dante)</div></div>
-    <div class="note-chip"><div class="note-num">03</div><div class="note-text">Integratori e barrette: MyProtein, Koro, Prozis, Bulk. Per trasferte: barrette 20-30gr, gallette, frutta secca, lupini</div></div>
-    <div class="note-chip"><div class="note-num">04</div><div class="note-text">Frutta: agrumi, mele, pere, kiwi, uva, fichi, susine, melograno. Verdura: cavoli, cime di rapa, spinaci, carote, finocchi, carciofi, zucca</div></div>
+    <div class="note-chip"><div class="note-num">02</div><div class="note-text">Omega 3 (1 capsula a colazione) + Mg Bisglicinato prima di dormire (Dante). Negli allenamenti intensi aggiungi elettroliti Enervit nella borraccia o un pizzico di sale in più nel pasto</div></div>
+    <div class="note-chip"><div class="note-num">03</div><div class="note-text">Integratori e barrette: MyProtein, Koro, Enervit. Per trasferte: barrette 20-30gr, gallette, frutta secca</div></div>
+    <div class="note-chip"><div class="note-num">04</div><div class="note-text">Frutta estiva: pesche, albicocche, susine, anguria, melone, fichi, uva, mirtilli, more, lamponi. Verdura: pomodori, peperoni, zucchine, melanzane, cetrioli, bietole, lattuga, rucola. Ok surgelata (controlla ingredienti)</div></div>
     <div class="note-chip"><div class="note-num">05</div><div class="note-text">Caffè: max 3-4/giorno (Dante) · max 1/giorno (Laura)</div></div>
     <div class="note-chip"><div class="note-num">06</div><div class="note-text">Alcol: max 2 calici vino o birra 0.33cl a settimana (Dante)</div></div>
     <div class="note-chip"><div class="note-num">07</div><div class="note-text">Formaggi freschi > stagionati: ricotta, primo sale, fiocchi di latte, Ph. Benessere. Preferire carni bianche</div></div>
@@ -341,40 +334,40 @@
 <script>
 const dietDante = {
   1:{
-    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Cous cous 60gr + pollo 200gr + verdura 200gr + olio evo 10ml + un frutto",spuntino:"2 gallette al cioccolato",cena:"Spatzle di zucca 120-150gr (Mamma Emma) + cremina con Philadelphia Benessere 50gr + acqua + parmigiano 10gr"},
-    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Patate 200gr + merluzzo gratinato al forno 200gr + verdura 150gr + olio evo 10ml"},
-    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Riso basmati 70gr + ceci o lenticchie cotti 130gr + carote + olio evo 15ml",spuntino:"Proteine polvere Whey 20gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Pane ai cereali 60gr + 2 uova strapazzate o al tegamino + Philadelphia Benessere 30gr + verdura grigliata + olio evo 15ml"},
-    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr",cena:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
-    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Riso basmati o venere 60gr + gamberetti 200gr + verdura 150-200gr + olio evo 15ml",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Pasta 80gr con crema di piselli: piselli cotti 150gr frullati con acqua di cottura + olio evo 10ml + sale/pepe + parmigiano 1 cucchiaino"},
-    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Polenta 50gr + pollo 200gr o carne rossa magra 150gr (es. roastbeef) + verdura + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
-    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 60gr + finocchi o carote crude"}
+    lunedi:   {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Frittata di 2 uova con verdura + olio evo 10ml + pane ai cereali 70gr + un frutto",spuntino:"2 gallette al cioccolato",cena:"Riso basmati o orzo o farro 60gr + mozzarella High Pro 100gr + verdura a piacere + olio evo 10ml + prosciutto cotto 50gr o piselli 60-70gr"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Cous cous o riso o farro 60gr + pollo 120-130gr + olio evo 10ml + verdura",merenda:"Yogurt bianco o kefir 125gr + un frutto + cioccolato 10gr",cena:"Patate 200gr + merluzzo gratinato al forno 250gr o orata 180gr + verdura 150gr + olio evo 10ml"},
+    mercoledi:{pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt bianco greco 0% 150gr + un frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"Pasta di lenticchie 100gr con pesto di zucchine (zucchine spadellate frullate con olio evo 10ml + basilico + pinoli 10gr) + parmigiano 10gr",merenda:"Proteine Whey 20gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Riso basmati o venere o farro/orzo 60-70gr + gamberetti 250gr + verdura + olio evo 10ml"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Insalatona con pollo o tacchino o arista 120-130gr + olio evo 10ml + pesca grigliata o fette di mela + aceto balsamico 1 cucchiaio + gallette di mais 5",spuntino:"Un frutto + frutta secca 10gr",cena:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
+    venerdi:  {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Pasta 80gr con tonno sgocciolato (scatoletta 120gr) + pomodorini",merenda:"Simil granita: frutta 150-200gr congelata o fresca + ghiaccio + latte vaccino o veg 150ml, tutto frullato",cena:"Piadine di ceci: frulla ceci 130gr + fiocchi d'avena baby 30-40gr + sale + acqua + lievito per salati 1 cucchiaino. Cuoci in padella e condisci con verdura + ricotta o Ph. Benessere 50gr + olio evo 1 cucchiaino"},
+    sabato:   {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Insalatona con pollo 200gr o carne rossa magra 150gr (roastbeef) + verdura + olio evo 10ml",merenda:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt bianco greco 0% 150gr + frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"🍽️ Fuori",merenda:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 70gr + verdura"}
   },
   2:{
-    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pasta di lenticchie 100gr con sugo al pomodoro + zucchine spadellate con 1 cucchiaino olio evo",spuntino:"2 gallette al cioccolato oppure un frutto + frutta secca 10gr",cena:"Gnocchi al pomodoro 200gr + bresaola 90gr o prosciutto cotto 70gr + parmigiano 10gr + verdura (es. rucola)"},
-    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Patate al forno o purè 200gr + pollo/tacchino 200gr o vitello 180gr + verdura 150gr + olio evo 10ml"},
-    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Riso basmati 70gr + salmone fresco 100gr (Esselunga Top) + zucchine o cavoletti + olio evo 15ml",spuntino:"Proteine polvere Whey 25gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Pane 70gr o carasau o 2 fajitas di mais 40gr + hummus di ceci 130gr + guacamole 20-30gr o parmigiano 10gr + verdura grigliata"},
-    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr",cena:"Pasta 80gr con crema di zucca e feta: zucca cotta 200gr frullata con olio evo 10ml + feta light 90gr a cubetti"},
-    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Ravioli di carne 180gr con sugo al pomodoro + zucchine spadellate con 1 cucchiaino olio evo",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Pane 60gr + 2 uova al tegamino o strapazzate + olio evo 10ml + verdura + parmigiano 5-7gr"},
-    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Patate al forno o bollite 200gr + tartare di Chianina/Fassona 150gr + verdura + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
-    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"Pane 60gr o carasau + hummus di ceci 130gr + verdura cruda"}
+    lunedi:   {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Riso basmati o orzo o farro 60gr + 2 uova sode + verdura + olio evo 10ml",spuntino:"Fetta di pane con nocciolata 10gr o crema frutta secca 100% + banana (puoi caramellizzarla con 1 cucchiaino miele)",cena:"Gnocchi 200-220gr con pomodoro + mozzarella High Pro 100gr + olio evo 10ml"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Patate 200gr + pollo o tacchino o arista o vitello 120-130gr + verdura + olio evo 10ml",merenda:"Yogurt bianco o kefir 125gr + un frutto + cioccolato 10gr oppure Danone/Kefir da bere + un frutto",cena:"Sogliola 150-180gr (ok impanata al forno) + verdura + olio evo 10ml + pane 70gr o gallette di mais 5"},
+    mercoledi:{pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt bianco greco 0% 150gr + un frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"Pane 60-70gr + 2 uova strapazzate + Ph. Benessere 30gr o parmigiano 10gr + verdura + olio evo 10ml",merenda:"Proteine Whey 20gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Piadina senza strutto con olio evo + hummus 130gr + verdura grigliata"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto",spuntino:"Un frutto + frutta secca 10gr",cena:"Pasta 80gr con crema di zucchine (spadellate con olio evo 10ml e frullate con acqua di cottura) + gamberetti 250gr + scorza di limone q.b."},
+    venerdi:  {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Cous cous 60gr + pollo 120-130gr + verdura + olio evo 10ml",merenda:"Simil granita: frutta 150-200gr congelata o fresca + ghiaccio + latte vaccino o veg 150ml, tutto frullato",cena:"Burger di ceci e carote: frulla ceci cotti 130gr + 2 carote medie + pangrattato 1 cucchiaio + sale/pepe. Forma burger e cuoci in padella con olio evo 10ml. Accompagna con pane 70gr + salsa 10gr + verdura"},
+    sabato:   {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Insalatona con pollo 200gr o carne rossa magra 150gr + verdura + olio evo 10ml + gallette di mais 5 o patate 200gr",merenda:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt bianco greco 0% 150gr + frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"🍽️ Fuori",merenda:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 70gr + verdura"}
   },
   3:{
-    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pane 60gr + salmone affumicato 70gr + avocado 30-40gr o Philadelphia Benessere 30gr + olio evo 1 cucchiaino + verdura 200gr + un frutto",spuntino:"2 gallette al cioccolato",cena:"Spatzle di spinaci 120-150gr + cremina con ricotta 100gr + acqua + pomodorini"},
-    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Polenta 50gr + pollo 200gr o straccetti di soia 80gr + verdura + olio evo 10ml"},
-    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Pasta di lenticchie 80gr con sugo al pomodoro + zucchine spadellate con olio evo 5ml",spuntino:"Proteine polvere Whey 20gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Riso venere o basmati 70gr + 2 uova sode + verdura + olio evo 10ml + parmigiano 5-7gr"},
-    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr o cioccolato",cena:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
-    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Cous cous 60gr + ceci 150gr + verdura 150gr + olio evo 10ml",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Patate al forno o bollite 200gr + pollo o coniglio 180gr + verdura + olio evo 10ml"},
-    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Polenta 50gr + merluzzo al pomodoro 180gr + verdura + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
-    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 60gr + finocchi o carote crude"}
+    lunedi:   {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pane 60-70gr + 2 uova al tegamino + parmigiano 10gr o Ph. Benessere 30gr + olio evo 10ml",spuntino:"Fetta di pane con nocciolata 10gr o crema frutta secca + banana (puoi caramellizzarla) oppure 2 gallette al cioccolato",cena:"Pasta 70-80gr con crema di zucca Delica + feta light 100gr + olio evo 10ml (cuoci feta e zucca in forno, schiaccia con forchetta aggiungendo acqua di cottura fino a consistenza desiderata)"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Cous cous o riso basmati 60gr + pollo o tacchino o arista o vitello 120-130gr + verdura + olio evo 10ml",merenda:"Yogurt bianco o kefir 125gr + un frutto + cioccolato 10gr oppure Danone/Kefir da bere + un frutto oppure gelatino (fior di fragola/cremino/coppa del nonno/mini magnum/mini cornetto)",cena:"Patate 200gr + merluzzo 250gr o pesce spada 150gr + verdura + olio evo 10ml"},
+    mercoledi:{pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt bianco greco 0% 150gr + un frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"Cous cous 60gr + tofu affumicato 100gr o straccetti di soia 70-80gr + verdura + olio evo 10ml",merenda:"Un frutto + cioccolato 10gr + frutta secca 10gr",cena:"Piadina senza strutto con olio evo + bresaola o cotto o crudo o tacchino arrosto 70gr + verdura grigliata + Ph. Benessere 30gr"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pasta Strapasta 70-80gr + crema di piselli: piselli cotti 130gr frullati con acqua di cottura + olio evo 10ml + parmigiano 10gr",spuntino:"Un frutto + frutta secca 10gr",cena:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
+    venerdi:  {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Insalatona con pollo 120gr + salsa tzatziki 20gr + olio evo 10ml + pane normale o carasau 60gr",merenda:"Simil granita: frutta 150-200gr congelata o fresca + ghiaccio + latte vaccino o veg 150ml, tutto frullato",cena:"Pasta di lenticchie 100gr con sugo al pomodoro + zucchine spadellate con olio evo 10ml + parmigiano 1 cucchiaino"},
+    sabato:   {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Polpo o molluschi 200gr + patate 200gr + verdura + olio evo 10ml",merenda:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt bianco greco 0% 150gr + frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"🍽️ Fuori",merenda:"Frutta fresca",cena:"2 uova strapazzate (olio evo 10ml) + pane 70gr + verdura"}
   },
   4:{
-    lunedi:   {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Cous cous 60gr + gamberetti 200gr + verdura 200gr + olio evo 10ml + un frutto",spuntino:"2 gallette al cioccolato",cena:"Ravioli con ricotta e spinaci 180-200gr + sugo al pomodoro + un frutto"},
-    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Panino con mozzarella e pomodoro o verdura grigliata oppure prosciutto (crudo/cotto/bresaola/tacchino) + pomodoro o verdure grigliate",spuntino:"Frutto + cioccolato 10gr o frutta secca 15gr",cena:"Cous cous 60gr + pollo e peperoni 200gr + olio evo 10ml"},
-    mercoledi:{pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Yogurt greco 0% 120gr + un frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"Riso basmati 70gr + ceci o lenticchie cotti 130gr + carote + olio evo 15ml",spuntino:"Proteine polvere Whey 25gr in 400ml acqua o cremina sul frutto + un frutto o barretta proteica 25gr",cena:"Pane ai cereali 60gr + 2 uova strapazzate o al tegamino + Philadelphia Benessere 30gr + verdura grigliata + olio evo 15ml"},
-    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + riso soffiato cioccolato 30-35gr + frutta secca 10gr",pranzo:"Mensa: secondo (carne o pesce ai ferri) + verdura con 1 cucchiaio olio evo + un panino",spuntino:"Un frutto + frutta secca 10gr",cena:"Gnocchi di zucca 200gr (Mamma Emma) + feta light 90gr o cremina con Philadelphia Benessere 50gr + parmigiano 10gr"},
-    venerdi:  {pre:"2 cucchiaini di miele (15 min prima dell'allenamento)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Riso basmati o venere 60gr + pollo 180gr o bresaola 90-100gr + verdura 150-200gr + olio evo 15ml",spuntino:"Mela e pera cotta con cannella + yogurt greco 125gr + cioccolato 10gr",cena:"Vellutata di piselli e patate (150gr+150gr) + pane 50gr + un frutto"},
-    sabato:   {pre:null,colazione:"Yogurt greco 0% 150gr + frutta disidratata 20-30gr (o un frutto) + granola 25gr o riso soffiato cioccolato 30-35gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pasta 80gr con zucchine e bocconcini di pesce spada 150gr totale + olio evo 10ml",spuntino:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
-    domenica: {pre:null,colazione:"Yogurt greco 0% 120gr + frutto + cannella + 2 fette di pane bianco o ai cereali + nocciolata 15gr",pranzo:"🍽️ Fuori",spuntino:"Frutta fresca",cena:"2 uova al pomodoro (olio evo 10ml) + pane 60gr + finocchi o carote crude"}
+    lunedi:   {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Pane 60-70gr + frittata di 2 uova con verdura + parmigiano 10gr o Ph. Benessere 30gr + olio evo 10ml",spuntino:"Fetta di pane con nocciolata 10gr o crema frutta secca + banana (puoi caramellizzarla) oppure 2 gallette al cioccolato",cena:"Gnocchi 200gr con crema di melanzane e pomodorini (melanzana a tocchetti + pomodorini in forno con olio evo 10ml + sale/pepe, frulla con acqua di cottura) + mozzarella High Pro 100gr a caldo"},
+    martedi:  {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Piadina senza strutto + pollo impanato con farina di mais o gallette sbriciolate 120-130gr (cotto in forno o friggitrice ad aria) + verdura",merenda:"Yogurt bianco o kefir 125gr + un frutto + cioccolato 10gr oppure Danone/Kefir da bere + un frutto oppure gelatino (fior di fragola/cremino/coppa del nonno/mini magnum/mini cornetto)",cena:"Patate 200gr + merluzzo 250gr o pesce spada 150gr + verdura + olio evo 10ml"},
+    mercoledi:{pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Yogurt bianco greco 0% 150gr + un frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"Pasta o riso basmati 70-80gr con tonno sgocciolato 120gr + pomodorini",merenda:"Un frutto + cioccolato 10gr + frutta secca 10gr",cena:"Pane 70gr + 2 uova strapazzate + olio evo 10ml o avocado 40-50gr + verdura a piacere"},
+    giovedi:  {pre:null,colazione:"Yogurt greco 0% 150gr + un frutto + granola 30gr o riso soffiato al cioccolato/barchette 40gr + frutta secca 15gr o cioccolato 10gr",pranzo:"Cous cous 60gr + ceci 130-150gr + verdura + parmigiano 1 cucchiaino + olio evo 10ml",spuntino:"Un frutto + frutta secca 10gr",cena:"Frisella 70-80gr + mozzarella o ricotta 100gr + verdura grigliata + olio evo 10ml + un frutto"},
+    venerdi:  {pre:"2 cucchiaini di miele oppure fetta di pane bianco + 1 cucchiaio miele + pizzico di sale (15 min prima)",colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Insalatona con pollo 120gr o crudo 70gr + pesca grigliata o 2 fichi + olio evo 10ml + aceto balsamico 1 cucchiaino + pane normale o carasau 60gr",merenda:"Simil granita: frutta 150-200gr congelata o fresca + ghiaccio + latte vaccino o veg 150ml, tutto frullato",cena:"Pasta di lenticchie 100gr con pesto 20gr + parmigiano 1 cucchiaino + carotine o finocchi crudi"},
+    sabato:   {pre:null,colazione:"Porridge: fiocchi d'avena 40gr + acqua calda 120-150ml + proteine polvere cioccolato 30gr + un frutto + frutta secca 10gr o crema frutta secca 100%",pranzo:"Polpo o molluschi 200gr o pesce spada 150gr + patate 200gr + verdura + olio evo 10ml",merenda:"Frutta fresca 100-150gr + frutta secca 10gr",cena:"🍕 Pizza"},
+    domenica: {pre:null,colazione:"Yogurt bianco greco 0% 150gr + frutto + cannella + 2 fette pane bianco o ai cereali + nocciolata 10gr",pranzo:"🍽️ Fuori",merenda:"Frutta fresca",cena:"Farinata Zanini (mezza porzione) + pane 50gr + verdura grigliata"}
   }
 };
 
@@ -456,11 +449,11 @@ const sharedMeals = {
 const DAY_KEYS=['lunedi','martedi','mercoledi','giovedi','venerdi','sabato','domenica'];
 const DAY_LABELS={lunedi:'Lunedì',martedi:'Martedì',mercoledi:'Mercoledì',giovedi:'Giovedì',venerdi:'Venerdì',sabato:'Sabato',domenica:'Domenica'};
 const DAY_SHORT={lunedi:'Lun',martedi:'Mar',mercoledi:'Mer',giovedi:'Gio',venerdi:'Ven',sabato:'Sab',domenica:'Dom'};
-const MEAL_NAMES={colazione:'Colazione',merenda_m:'Merenda mattina',pranzo:'Pranzo',spuntino:'Spuntino',merenda_p:'Merenda pom.',cena:'Cena'};
-const MEAL_ICONS={colazione:'🥣',merenda_m:'🍊',pranzo:'🍽️',spuntino:'🍎',merenda_p:'🍫',cena:'🌙'};
+const MEAL_NAMES={colazione:'Colazione',merenda_m:'Merenda mattina',pranzo:'Pranzo',spuntino:'Spuntino',merenda:'Merenda pom.',merenda_p:'Merenda pom.',cena:'Cena'};
+const MEAL_ICONS={colazione:'🥣',merenda_m:'🍊',pranzo:'🍽️',spuntino:'🍎',merenda:'🍫',merenda_p:'🍫',cena:'🌙'};
 const DANTE_MEALS=['colazione','pranzo','spuntino','cena'];
-const LAURA_MEALS=['colazione','merenda_m','pranzo','spuntino','merenda_p','cena'];
-const CYCLE_START=new Date('2026-05-04T00:00:00');
+const LAURA_MEALS=['colazione','merenda_m','pranzo','spuntino','cena'];
+const CYCLE_START=new Date('2026-08-17T00:00:00');
 
 function getWeekDay(){
   const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
@@ -482,7 +475,7 @@ function setPerson(p){
   ['btn-laura','wbtn-laura'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='person-btn'+(p==='laura'?' laura-active':'');});
   document.querySelectorAll('.laura-only').forEach(el=>el.style.display=p==='laura'?'':'none');
   buildPreWorkout();
-  ['colazione','merenda_m','pranzo','spuntino','merenda_p','cena'].forEach(m=>buildBody(m));
+  ['colazione','merenda_m','pranzo','spuntino','cena'].forEach(m=>buildBody(m));
   showWeek(selWeek,null);
 }
 
@@ -491,7 +484,7 @@ function init(){
   const dl=DAY_LABELS[CD];
   document.getElementById('today-display').innerHTML=dl.slice(0,3)+'<span>'+dl.slice(3)+'</span>';
   document.getElementById('today-week-info').innerHTML=`<b>Settimana ${CW}</b> &nbsp;·&nbsp; Piano alimentare Fusco`;
-  ['colazione','merenda_m','pranzo','spuntino','merenda_p','cena'].forEach(m=>buildBody(m));
+  ['colazione','merenda_m','pranzo','spuntino','cena'].forEach(m=>buildBody(m));
   buildPreWorkout();
   showWeek(CW,null);
   showCucinaWeek(CW,null);
@@ -499,7 +492,31 @@ function init(){
   document.querySelectorAll('.cucina-week-btn').forEach((b,i)=>{if(i+1===CW)b.classList.add('active');});
 }
 
+// Keys that feed into the unified "Spuntino" panel per person
+const SPUNTINO_KEYS_DANTE=['spuntino','merenda'];
+const SPUNTINO_KEYS_LAURA=['spuntino','merenda_p'];
+
 function buildBody(mk){
+  // Spuntino panel aggregates multiple keys
+  if(mk==='spuntino'){
+    const el=document.getElementById('body-spuntino');if(!el)return;
+    const diet=getDiet();if(!diet[CW])return;
+    const keys=person==='dante'?SPUNTINO_KEYS_DANTE:SPUNTINO_KEYS_LAURA;
+    let html='';
+    DAY_KEYS.forEach(day=>{
+      const d=diet[CW][day];if(!d)return;
+      // Collect all non-null snack entries for this day
+      const parts=keys.map(k=>d[k]).filter(Boolean);
+      if(!parts.length)return;
+      const isT=day===CD;
+      const foodHtml=parts.length>1
+        ? parts.map((p,i)=>`<span style="display:block;margin-bottom:${i<parts.length-1?'6px':'0'}">${p}</span>`).join('')
+        : parts[0];
+      html+=`<div class="day-row ${isT?'today-row':''}"><div class="day-label">${DAY_SHORT[day]}${isT?' ←':''}</div><div class="day-food">${foodHtml}</div></div>`;
+    });
+    el.innerHTML=html||'<div style="padding:12px;color:var(--text-dim);font-size:12px;text-align:center;">—</div>';
+    return;
+  }
   const el=document.getElementById('body-'+mk);if(!el)return;
   const diet=getDiet();if(!diet[CW])return;
   let html='';
@@ -526,9 +543,19 @@ function showWeek(wn,btn){
   let html='';
   DAY_KEYS.forEach(day=>{
     const d=diet[wn][day],isT=wn===CW&&day===CD;
+    const mealRows=meals.map(mk=>{
+      if(mk==='spuntino'){
+        const keys=person==='dante'?SPUNTINO_KEYS_DANTE:SPUNTINO_KEYS_LAURA;
+        const parts=keys.map(k=>d[k]).filter(Boolean);
+        if(!parts.length)return'';
+        const txt=parts.join('<br>');
+        return`<div class="day-meal-row"><div class="day-meal-label">Spuntino</div><div class="day-meal-text">${txt}</div></div>`;
+      }
+      return d[mk]?`<div class="day-meal-row"><div class="day-meal-label">${MEAL_NAMES[mk]}</div><div class="day-meal-text">${d[mk]}</div></div>`:'';
+    }).join('');
     html+=`<div class="day-block"><div class="day-block-label ${isT?'today':''}">${DAY_LABELS[day]}${isT?' · Oggi':''}</div><div class="day-block-card ${isT?'today':''}">
     ${person==='dante'&&d.pre?`<div class="day-pre">⚡️ Pre-workout: ${d.pre}</div>`:''}
-    ${meals.map(mk=>d[mk]?`<div class="day-meal-row"><div class="day-meal-label">${MEAL_NAMES[mk]}</div><div class="day-meal-text">${d[mk]}</div></div>`:'').join('')}
+    ${mealRows}
     </div></div>`;
   });
   document.getElementById('week-view').innerHTML=html;
@@ -578,7 +605,15 @@ function showPage(pid,el){
 function copyTodayMeal(mk,btn){
   const d=getDiet()[CW][CD];
   const pre=mk==='colazione'&&person==='dante'&&d.pre?`⚡️ Pre-workout: ${d.pre}\n\n`:'';
-  const text=`${MEAL_ICONS[mk]} ${MEAL_NAMES[mk]} – ${DAY_LABELS[CD]} (Sett. ${CW})\n\n${pre}${d[mk]||'—'}`;
+  let food;
+  if(mk==='spuntino'){
+    const keys=person==='dante'?SPUNTINO_KEYS_DANTE:SPUNTINO_KEYS_LAURA;
+    const parts=keys.map(k=>d[k]).filter(Boolean);
+    food=parts.join('\n') || '—';
+  } else {
+    food=d[mk]||'—';
+  }
+  const text=`${MEAL_ICONS[mk]} ${MEAL_NAMES[mk]} – ${DAY_LABELS[CD]} (Sett. ${CW})\n\n${pre}${food}`;
   navigator.clipboard.writeText(text).then(()=>{
     btn.textContent='✓ Copiato';btn.classList.add('copied');
     setTimeout(()=>{btn.textContent='Copia';btn.classList.remove('copied');},2000);
